@@ -2,9 +2,10 @@ const { app, BrowserWindow,ipcMain } = require('electron');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const screenshot = require('screenshot-desktop');
+var robot = require("robotjs");
 
 
-const socket = require('socket.io-client')('http://192.168.0.253:5000');
+const socket = require('socket.io-client')('http://70e5-2a02-908-1b51-ee60-6469-1443-e696-928c.ngrok.io');
 let interval;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -25,8 +26,28 @@ const createWindow = () => {
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
+  socket.on("mouse-move", function(data){
+    var obj = JSON.parse(data);
+    var x = obj.x;
+    var y = obj.y;
+
+    robot.moveMouse(x, y);
+  })
+
+  socket.on("mouse-click", function(data){
+    robot.mouseClick();
+  })
+
+  socket.on("type", function(data){
+    var obj = JSON.parse(data);
+    var key = obj.key;
+
+    robot.keyTap(key);
+  })
+
+
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
